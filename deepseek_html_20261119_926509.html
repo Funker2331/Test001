@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>病人用药日报</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+</head>
+<body>
+  <h2>病人用药记录</h2>
+  <input id="search" placeholder="搜索病人/病情/药物">
+  <table id="report" class="display">
+    <thead>
+      <tr><th>日期</th><th>病人</th><th>病情</th><th>当日用药</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    // 数据(实际可从 report.json fetch)
+    const data = [
+      ["2024-01-15", "张三", "高血压", "氨氯地平"],
+      ["2024-01-15", "李四", "糖尿病", "二甲双胍, 胰岛素"]
+    ];
+    const table = $('#report').DataTable({
+      data: data,
+      columns: [{title:"日期"},{title:"病人"},{title:"病情"},{title:"当日用药"}],
+      pageLength: 20,
+      language: { search: "搜索:", lengthMenu: "每页 _MENU_ 条" }
+    });
+  </script>
+</body>
+</html>
