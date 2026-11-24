@@ -4,6 +4,21 @@
   <meta charset="utf-8">
   <title>病人用药日报</title>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- 引入 PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+  <style>
+    /* 上传区域样式 */
+    #uploadArea {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #pageCount {
+      padding: 4px 8px;
+      width: 220px;
+    }
+  </style>
 </head>
 <body>
   <h2>病人用药记录</h2>
@@ -14,6 +29,14 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <!-- ===== 新增区域：上传病例 + 显示页数 ===== -->
+  <div id="uploadArea">
+    <input type="file" id="pdfUpload" accept="application/pdf" style="display:none;">
+    <button type="button" onclick="document.getElementById('pdfUpload').click();">上传病例</button>
+    <input type="text" id="pageCount" readonly placeholder="页数：">
+  </div>
+  <!-- ===== 新增区域结束 ===== -->
 
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -29,6 +52,31 @@
       pageLength: 20,
       language: { search: "搜索:", lengthMenu: "每页 _MENU_ 条" }
     });
+
+    // ===== PDF 页数识别逻辑 =====
+    document.getElementById('pdfUpload').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const pageCountBox = document.getElementById('pageCount');
+
+      if (!file || file.type !== 'application/pdf') {
+        pageCountBox.value = '请选择 PDF 文件';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const typedarray = new Uint8Array(e.target.result);
+
+        pdfjsLib.getDocument(typedarray).promise.then(function (pdf) {
+          pageCountBox.value = '页数：' + pdf.numPages;
+        }).catch(function (error) {
+          console.error('解析 PDF 失败:', error);
+          pageCountBox.value = '解析失败';
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    // ===== PDF 页数识别逻辑结束 =====
   </script>
 </body>
 </html>
